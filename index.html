@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>COFFEE</title>
+    <link rel="stylesheet" href="style.css">
+
+</head>
+
+
+<body>
+    <div id="app" class="px-4">
+        <div class="wrap">
+
+            <header class="my-1">
+                <a href="#" class="text-1">
+                    <h1 class="tit">Suerte 메뉴관리🍀</h1>
+                </a>
+                <nav class="menu">
+                    <button data-category-name="coffee" class="header-btn">
+                        ☕ coffee
+
+                    </button>
+                    <button data-category-name="ade" class="header-btn">
+                        🍒ade
+
+                    </button>
+                    <button data-category-name="tea" class="header-btn">
+                        🍵tea
+
+                    </button>
+                    <button data-category-name="dessert" class="header-btn">
+                        🍰dessert
+
+                    </button>
+                    <button data-category-name="etc" class="header-btn">
+                        🍷etc
+
+                    </button>
+                </nav>
+            </header>
+            <main class="wrapper">
+                <div class="my-2 menu-search">
+                    <h2 class="text2">☕ 커피 메뉴 관리</h2>
+                    <span class="menu-count">총 0개</span>
+                </div>
+                <form id="menu-form">
+                    <div class="d-flex">
+                        <!-- <label for="coffee-name" class="input-label">커피 메뉴이름</label> -->
+                        <input type="text" id="coffee-name" name="coffee-list" class="input-field"
+                            placeholder="커피이름을 입력해주세요." autocomplete="off">
+                        <button type="button" name="coffee-submit-1" id="submit-button" class="coffee-submit">
+                            확인
+                        </button>
+                    </div>
+                </form>
+                <ul id="coffee-menu-list" class="mt-3 pl-0"></ul>
+            </div>
+            </main>
+
+        </div>
+
+    </div>
+
+
+    <script src="./routes/index.js"></script>
+
+</body>
+
+</html>
