@@ -1,23 +1,43 @@
+
 const $ = (selector) => document.querySelector(selector);
 
+
+const store = {
+  setLocalStorage(menu) {
+    localStorage.setItem("menu", JSON.stringify(menu));
+  },
+  getLocalStorage() {
+    return JSON.parse(localStorage.getItem("menu"));
+
+  },
+};
+
 function App() {
-  const updateMenuCount = () => {
-    const menuCount = $("#coffee-menu-list").querySelectorAll("li").length
-    $(".menu-count").innerText = `총${menuCount}개`;
+  this.menu = {
+    coffee:[],
+    ade:[],
+    tea:[],
+    dessert:[],
+    etc:[],
+
+
   };
-
-  const addMenuName = () => {
-    if ($("#coffee-name").value === "") {
-      alert("값을 입력해주세요.");
-      return;
+  this.currentCategory = "coffee";
+  this.init =()=>{
+    if(store.getLocalStorage().length>1){
+      this.menu=store.getLocalStorage();
     }
-    const coffeeName = $("#coffee-name").value;
-    const menuItemTemplate = (coffeeName) => {
+    render();
 
+  }
 
-      return `
-                  <li class="menu-list-item d-flex items-center py-2">
-              <span class="w-100 pl-2 menu-name">${coffeeName}</span>
+  const render = () => {
+    const template = this.menu[this.currentCategory]
+      .map((menuItem, index) => {
+
+        return `
+                  <li data-menu-id="${index}" class="menu-list-item d-flex items-center py-2">
+              <span class="w-100 pl-2 menu-name">${menuItem.name}</span>
               <button
                 type="button"
                 class="bg-gray-50 text-gray-500 text-sm mr-1 menu-edit-button"
@@ -30,32 +50,52 @@ function App() {
               >
                 삭제
               </button>
-            </li>`;
-    };
+            </li>`
+      })
+      .join("");
 
-    $("#coffee-menu-list").insertAdjacentHTML(
-      "beforeend",
-      menuItemTemplate(coffeeName)
-    );
 
+    $("#coffee-menu-list").innerHTML = template;
     updateMenuCount();
+    
+  }
+
+  const updateMenuCount = () => {
+    const menuCount = $("#coffee-menu-list").querySelectorAll("li").length
+    $(".menu-count").innerText = `총${menuCount}개`;
+  };
+
+  const addMenuName = () => {
+    if ($("#coffee-name").value === "") {
+      alert("값을 입력해주세요.");
+      return;
+    }
+    const coffeeMenuName = $("#coffee-name").value;
+    this.menu[this.currentCategory].push({
+      name: coffeeMenuName
+    });
+    store.setLocalStorage(this.menu);
+    render();
+    
     $("#coffee-name").value = ""
 
   }
 
   const updateMenuName = (e) => {
-    const $menuName = e.target
-      .closest("li")
-      .querySelector(".menu-name")
-    const updatedMenuName = prompt(
-      $menuName.innerText + "를 수정 하시겠습니까?",
-      $menuName.innerText
-    );
+    const menuId = e.target.closest("li").dataset.menuId;
+    const $menuName = e.target.closest("li").querySelector(".menu-name")
+    const updatedMenuName = prompt($menuName.innerText +
+      "를 수정 하시겠습니까?", $menuName.innerText);
+    this.menu[this.currentCategory][menuId].name = updatedMenuName;
+    store.setLocalStorage(this.menu);
     $menuName.innerText = updatedMenuName;
   }
 
   const removeMenuName = (e) => {
     if (confirm("정말 삭제하시겠습니까?")) {
+      const menuId = e.target.closest("li").dataset.menuId;
+      this.menu[this.currentCategory].splice(menuId, 1);
+      store.setLocalStorage(this.menu);
       e.target.closest("li").remove();
       updateMenuCount();
 
@@ -80,7 +120,7 @@ function App() {
 
 
 
-  $("#submit-button").addEventListener("click",   addMenuName);
+  $("#submit-button").addEventListener("click", addMenuName);
 
   $("#coffee-name").addEventListener("keypress", (e) => {
     if (e.key !== "Enter") {
@@ -91,6 +131,22 @@ function App() {
 
   });
 
+  $("nav").addEventListener("click",(e)=>{
+    const isCategoryButton = e.target.classList.contains("header-btn");
+    if (isCategoryButton){
+      const categoryName = e.target.dataset.categoryName;
+      this.currentCategory=categoryName;
+      $("#category-title").innerText = `${e.target.innerText} 메뉴관리`;
+      render();
+
+    }
+    
+    
+  });
+ 
+  
+
 };
 
-App();
+ const app =new App();
+app.init();
