@@ -1,35 +1,27 @@
+import {$} from"./dom.js";
+import store from "../store/index.js";
 
-const $ = (selector) => document.querySelector(selector);
 
-
-const store = {
-  setLocalStorage(menu) {
-    localStorage.setItem("menu", JSON.stringify(menu));
-  },
-  getLocalStorage() {
-    return JSON.parse(localStorage.getItem("menu"));
-
-  },
-};
 
 function App() {
   this.menu = {
-    coffee:[],
-    ade:[],
-    tea:[],
-    dessert:[],
-    etc:[],
+    coffee: [],
+    ade: [],
+    tea: [],
+    dessert: [],
+    etc: [],
 
 
   };
   this.currentCategory = "coffee";
-  this.init =()=>{
-    if(store.getLocalStorage().length>1){
-      this.menu=store.getLocalStorage();
+  this.init = () => {
+    if (store.getLocalStorage().length > 1) {
+      this.menu = store.setLocalStorage();
     }
     render();
+    initEventListeners();
 
-  }
+  };
 
   const render = () => {
     const template = this.menu[this.currentCategory]
@@ -37,7 +29,15 @@ function App() {
 
         return `
                   <li data-menu-id="${index}" class="menu-list-item d-flex items-center py-2">
-              <span class="w-100 pl-2 menu-name">${menuItem.name}</span>
+              <span class= "w-100 pl-2 menu-name ${menuItem.soldOut ? 'sold-out':""}
+              "> ${menuItem.name}</span>
+             
+              <button
+                type="button"
+                class="bg-gray-50 text-gray-500 text-sm mr-1  menu-sold-out-button"
+              >
+                품절
+              </button>
               <button
                 type="button"
                 class="bg-gray-50 text-gray-500 text-sm mr-1 menu-edit-button"
@@ -50,6 +50,8 @@ function App() {
               >
                 삭제
               </button>
+             
+              
             </li>`
       })
       .join("");
@@ -57,11 +59,12 @@ function App() {
 
     $("#coffee-menu-list").innerHTML = template;
     updateMenuCount();
-    
-  }
+
+
+  };
 
   const updateMenuCount = () => {
-    const menuCount = $("#coffee-menu-list").querySelectorAll("li").length
+    const menuCount = this.menu[this.currentCategory].length;
     $(".menu-count").innerText = `총${menuCount}개`;
   };
 
@@ -76,7 +79,7 @@ function App() {
     });
     store.setLocalStorage(this.menu);
     render();
-    
+
     $("#coffee-name").value = ""
 
   }
@@ -88,35 +91,53 @@ function App() {
       "를 수정 하시겠습니까?", $menuName.innerText);
     this.menu[this.currentCategory][menuId].name = updatedMenuName;
     store.setLocalStorage(this.menu);
-    $menuName.innerText = updatedMenuName;
-  }
+    render();
+  };
 
   const removeMenuName = (e) => {
     if (confirm("정말 삭제하시겠습니까?")) {
       const menuId = e.target.closest("li").dataset.menuId;
       this.menu[this.currentCategory].splice(menuId, 1);
       store.setLocalStorage(this.menu);
-      e.target.closest("li").remove();
-      updateMenuCount();
+      render();
+
 
     }
+
+  };
+  const soldOutMenu = (e) => {
+    const menuId = e.target.closest("li").dataset.menuId;
+    this.menu[this.currentCategory][menuId].soldOut = !this.menu[this.currentCategory][menuId].soldOut;
+    store.setLocalStorage(this.menu);
+    render();
+  };
+
+
+  const initEventListeners = () => {
+    $("#coffee-menu-list").addEventListener("click", (e) => {
+
+      if (e.target.classList.contains("menu-edit-button")) {
+        updateMenuName(e);
+        return;
+      }
+      if (e.target.classList.contains("menu-remove-button")) {
+        removeMenuName(e);
+        return;
+      }
+      if (e.target.classList.contains("menu-sold-out-button")) {
+        soldOutMenu(e);
+        return;
+      }
+    });
+
+    $("#menu-form").addEventListener("submit", (e) => {
+      e.preventDefault();
+    });
 
 
   }
-  $("#coffee-menu-list").addEventListener("click", (e) => {
 
-    if (e.target.classList.contains("menu-edit-button")) {
-      updateMenuName(e);
-    }
-    if (e.target.classList.contains("menu-remove-button")) {
-      removeMenuName(e);
-    }
 
-  });
-
-  $("#menu-form").addEventListener("submit", (e) => {
-    e.preventDefault();
-  });
 
 
 
@@ -131,22 +152,22 @@ function App() {
 
   });
 
-  $("nav").addEventListener("click",(e)=>{
+  $("nav").addEventListener("click", (e) => {
     const isCategoryButton = e.target.classList.contains("header-btn");
-    if (isCategoryButton){
+    if (isCategoryButton) {
       const categoryName = e.target.dataset.categoryName;
-      this.currentCategory=categoryName;
+      this.currentCategory = categoryName;
       $("#category-title").innerText = `${e.target.innerText} 메뉴관리`;
       render();
 
     }
-    
-    
+
+
   });
- 
-  
+
+
 
 };
 
- const app =new App();
+const app = new App();
 app.init();

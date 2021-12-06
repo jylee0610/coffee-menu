@@ -1,7 +1,5 @@
 @charset "utf-8";
 
-
-
 html,
 body {
     margin: 0;
@@ -98,6 +96,8 @@ h1 {
 .d-flex {
     display: flex;
 }
+
+
 
 .input-field {
     font-size: 1rem;

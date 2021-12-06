@@ -1,0 +1,26 @@
+
+
+hr {
+  border: 0;
+  height: 1px;
+  background-color: lightgray;
+}
+
+ul li button {
+  width: 60px;
+  line-height: inherit;
+  cursor: pointer;
+  height: auto;
+  border: none;
+  outline: none;
+  border-radius: 2rem;
+}
+
+ul li button:hover {
+  background-color: rgb(229, 231, 235);
+}
+
+.sold-out {
+  text-decoration: line-through;
+  color: gray;
+}
